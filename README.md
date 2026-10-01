@@ -1,4 +1,4 @@
-# AfterClass Frontend (CST3144)
+# AfterClass Frontend
 
 Vue.js front-end for the AfterClass after-school classes app.
 
