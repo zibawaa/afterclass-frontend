@@ -18,6 +18,8 @@
       <h2>{{ lesson.subject }}</h2>
       <p>Location: {{ lesson.location }}</p>
       <p>Price: £{{ lesson.price }}</p>
+      <p>Spaces: {{ lesson.availability }}</p>
+      <button v-on:click="addToCart" v-bind:disabled="!canAddToCart">Add to Cart</button>
     </div>
   </div>
 
@@ -26,13 +28,29 @@
     createApp({
       data() {
         return {
+          cart: [],
           lesson: {
+            id: 1001,
+            availability: 5,
             subject: 'Computer Science',
             location: 'Hendon',
             price: 120,
             image: 'images/computerScience.svg',
             alt: 'A computer screen showing code'
           }
+        }
+      },
+      methods: {
+        addToCart() {
+          if (this.canAddToCart) {
+            this.cart.push(this.lesson.id)
+            this.lesson.availability--
+          }
+        }
+      },
+      computed: {
+        canAddToCart() {
+          return this.lesson.availability > 0
         }
       }
     }).mount('#app')
