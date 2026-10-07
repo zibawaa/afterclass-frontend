@@ -7,6 +7,8 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <style>
     body { font-family: Arial, sans-serif; margin: 2rem; }
+    .order-form { display: flex; flex-direction: column; gap: 0.5rem; max-width: 300px; }
+    .confirmation { color: green; font-weight: bold; }
     .lessons { display: flex; flex-wrap: wrap; gap: 1.5rem; }
     .lesson { width: 260px; }
     .lesson img { width: 100%; height: auto; border-radius: 8px; }
@@ -15,8 +17,8 @@
 <body>
   <div id="app">
     <h1>AfterClass</h1>
-    <button v-on:click="toggleCart" v-bind:disabled="numberOfItems === 0">
-      Checkout ({{ numberOfItems }})
+    <button v-on:click="toggleCart" v-bind:disabled="numberOfItems === 0 && !displayCart">
+      Cart ({{ numberOfItems }})
     </button>
     <div v-if="!displayCart" class="lessons">
       <div v-for="lesson in lessons" :key="lesson.id" class="lesson">
@@ -30,6 +32,12 @@
     </div>
     <div v-else>
       <h2>Checkout</h2>
+      <p v-if="orderMessage" class="confirmation">{{ orderMessage }}</p>
+      <div class="order-form">
+        <label>Name: <input v-model="order.name" type="text" placeholder="Your name"></label>
+        <label>Phone: <input v-model="order.phone" type="text" placeholder="Your phone number"></label>
+        <button v-on:click="checkout" v-bind:disabled="!canCheckout">Checkout</button>
+      </div>
     </div>
   </div>
 
@@ -40,6 +48,8 @@
         return {
           cart: [],
           displayCart: false,
+          orderMessage: '',
+          order: { name: '', phone: '' },
           lessons: [
             { id: 1001, subject: 'Computer Science', location: 'Hendon', price: 120, availability: 5,
               image: 'images/computerScience.svg', alt: 'A computer screen showing code' },
@@ -62,11 +72,20 @@
             lesson.availability--
           }
         },
+        checkout() {
+          if (!this.canCheckout) return
+          this.orderMessage = 'Thank you ' + this.order.name + ', your order has been confirmed.'
+          this.cart = []
+          this.order = { name: '', phone: '' }
+        },
         canAddToCart(lesson) {
           return lesson.availability > 0
         }
       },
       computed: {
+        canCheckout() {
+          return this.order.name.trim() !== '' && this.order.phone.trim() !== ''
+        },
         numberOfItems() {
           return this.cart.length
         }
