@@ -7,7 +7,9 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <style>
     body { font-family: Arial, sans-serif; margin: 2rem; }
-    .lesson img { width: 300px; height: auto; border-radius: 8px; }
+    .lessons { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+    .lesson { width: 260px; }
+    .lesson img { width: 100%; height: auto; border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -16,13 +18,15 @@
     <button v-on:click="toggleCart" v-bind:disabled="numberOfItems === 0">
       Checkout ({{ numberOfItems }})
     </button>
-    <div v-if="!displayCart" class="lesson">
-      <img :src="lesson.image" :alt="lesson.alt">
-      <h2>{{ lesson.subject }}</h2>
-      <p>Location: {{ lesson.location }}</p>
-      <p>Price: £{{ lesson.price }}</p>
-      <p>Spaces: {{ lesson.availability }}</p>
-      <button v-on:click="addToCart" v-bind:disabled="!canAddToCart">Add to Cart</button>
+    <div v-if="!displayCart" class="lessons">
+      <div v-for="lesson in lessons" :key="lesson.id" class="lesson">
+        <img :src="lesson.image" :alt="lesson.alt">
+        <h2>{{ lesson.subject }}</h2>
+        <p>Location: {{ lesson.location }}</p>
+        <p>Price: £{{ lesson.price }}</p>
+        <p>Spaces: {{ lesson.availability }}</p>
+        <button v-on:click="addToCart(lesson)" v-bind:disabled="!canAddToCart(lesson)">Add to Cart</button>
+      </div>
     </div>
     <div v-else>
       <h2>Checkout</h2>
@@ -36,34 +40,35 @@
         return {
           cart: [],
           displayCart: false,
-          lesson: {
-            id: 1001,
-            availability: 5,
-            subject: 'Computer Science',
-            location: 'Hendon',
-            price: 120,
-            image: 'images/computerScience.svg',
-            alt: 'A computer screen showing code'
-          }
+          lessons: [
+            { id: 1001, subject: 'Computer Science', location: 'Hendon', price: 120, availability: 5,
+              image: 'images/computerScience.svg', alt: 'A computer screen showing code' },
+            { id: 1002, subject: 'Maths', location: 'Colindale', price: 80, availability: 5,
+              image: 'images/math.svg', alt: 'Maths sigma symbol' },
+            { id: 1003, subject: 'Art', location: 'Brent Cross', price: 90, availability: 5,
+              image: 'images/art.svg', alt: 'A pencil for art class' },
+            { id: 1004, subject: 'Music', location: 'Golders Green', price: 95, availability: 5,
+              image: 'images/music.svg', alt: 'A musical note' }
+          ]
         }
       },
       methods: {
         toggleCart() {
           this.displayCart = !this.displayCart
         },
-        addToCart() {
-          if (this.canAddToCart) {
-            this.cart.push(this.lesson.id)
-            this.lesson.availability--
+        addToCart(lesson) {
+          if (this.canAddToCart(lesson)) {
+            this.cart.push(lesson.id)
+            lesson.availability--
           }
+        },
+        canAddToCart(lesson) {
+          return lesson.availability > 0
         }
       },
       computed: {
         numberOfItems() {
           return this.cart.length
-        },
-        canAddToCart() {
-          return this.lesson.availability > 0
         }
       }
     }).mount('#app')
