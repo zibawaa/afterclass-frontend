@@ -7,6 +7,7 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <style>
     body { font-family: Arial, sans-serif; margin: 2rem; }
+    .cart-item { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
     .order-form { display: flex; flex-direction: column; gap: 0.5rem; max-width: 300px; }
     .confirmation { color: green; font-weight: bold; }
     .lessons { display: flex; flex-wrap: wrap; gap: 1.5rem; }
@@ -33,6 +34,14 @@
     <div v-else>
       <h2>Checkout</h2>
       <p v-if="orderMessage" class="confirmation">{{ orderMessage }}</p>
+      <div class="cart-summary">
+        <template v-for="lesson in lessons" :key="lesson.id">
+          <div v-if="countInCart(lesson.id) > 0" class="cart-item">
+            <span>{{ lesson.subject }} ({{ lesson.location }}) x {{ countInCart(lesson.id) }}</span>
+            <button v-on:click="removeFromCart(lesson)">Remove</button>
+          </div>
+        </template>
+      </div>
       <div class="order-form">
         <label>Name: <input v-model="order.name" type="text" placeholder="Your name"></label>
         <label>Phone: <input v-model="order.phone" type="text" placeholder="Your phone number"></label>
@@ -70,6 +79,16 @@
           if (this.canAddToCart(lesson)) {
             this.cart.push(lesson.id)
             lesson.availability--
+          }
+        },
+        countInCart(id) {
+          return this.cart.filter(item => item === id).length
+        },
+        removeFromCart(lesson) {
+          const index = this.cart.indexOf(lesson.id)
+          if (index !== -1) {
+            this.cart.splice(index, 1)
+            lesson.availability++
           }
         },
         checkout() {
