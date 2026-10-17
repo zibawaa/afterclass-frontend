@@ -10,6 +10,7 @@
     .cart-item { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
     .order-form { display: flex; flex-direction: column; gap: 0.5rem; max-width: 300px; }
     .confirmation { color: green; font-weight: bold; }
+    .sort-controls { display: flex; gap: 1rem; margin: 1rem 0; }
     .lessons { display: flex; flex-wrap: wrap; gap: 1.5rem; }
     .lesson { width: 260px; }
     .lesson img { width: 100%; height: auto; border-radius: 8px; }
@@ -21,8 +22,25 @@
     <button v-on:click="toggleCart" v-bind:disabled="numberOfItems === 0 && !displayCart">
       Cart ({{ numberOfItems }})
     </button>
-    <div v-if="!displayCart" class="lessons">
-      <div v-for="lesson in lessons" :key="lesson.id" class="lesson">
+    <div v-if="!displayCart">
+    <div class="sort-controls">
+      <label>Sort by:
+        <select v-model="sortType">
+          <option value="price">Price</option>
+          <option value="availability">Spaces</option>
+          <option value="location">Location</option>
+          <option value="subject">Subject</option>
+        </select>
+      </label>
+      <label>Order:
+        <select v-model="ascending">
+          <option :value="true">Ascending</option>
+          <option :value="false">Descending</option>
+        </select>
+      </label>
+    </div>
+    <div class="lessons">
+      <div v-for="lesson in sortedLessons" :key="lesson.id" class="lesson">
         <img :src="lesson.image" :alt="lesson.alt">
         <h2>{{ lesson.subject }}</h2>
         <p>Location: {{ lesson.location }}</p>
@@ -30,6 +48,7 @@
         <p>Spaces: {{ lesson.availability }}</p>
         <button v-on:click="addToCart(lesson)" v-bind:disabled="!canAddToCart(lesson)">Add to Cart</button>
       </div>
+    </div>
     </div>
     <div v-else>
       <h2>Checkout</h2>
@@ -57,6 +76,8 @@
         return {
           cart: [],
           displayCart: false,
+          sortType: 'price',
+          ascending: true,
           orderMessage: '',
           order: { name: '', phone: '' },
           lessons: []
@@ -101,6 +122,16 @@
         }
       },
       computed: {
+        sortedLessons() {
+          const key = this.sortType
+          const direction = this.ascending ? 1 : -1
+          return [...this.lessons].sort((a, b) => {
+            if (typeof a[key] === 'string') {
+              return a[key].localeCompare(b[key]) * direction
+            }
+            return (a[key] - b[key]) * direction
+          })
+        },
         canCheckout() {
           return this.order.name.trim() !== '' && this.order.phone.trim() !== ''
         },
