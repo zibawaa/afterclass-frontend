@@ -88,7 +88,7 @@
       },
       methods: {
         async fetchData() {
-          const url = 'http://localhost:3000/'
+          const url = 'http://localhost:3000/lessons'
           const response = await fetch(url)
           this.lessons = await response.json()
         },
