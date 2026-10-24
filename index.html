@@ -112,8 +112,23 @@
             lesson.availability++
           }
         },
-        checkout() {
+        async checkout() {
           if (!this.canCheckout) return
+          const newOrder = {
+            name: this.order.name,
+            phone: this.order.phone,
+            lessonIDs: this.cart,
+            spaces: this.cart.length
+          }
+          const response = await fetch(this.baseUrl + '/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newOrder)
+          })
+          if (!response.ok) {
+            this.orderMessage = 'Sorry, your order could not be submitted.'
+            return
+          }
           this.orderMessage = 'Thank you ' + this.order.name + ', your order has been confirmed.'
           this.cart = []
           this.order = { name: '', phone: '' }
