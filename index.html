@@ -41,7 +41,7 @@
     </div>
     <div class="lessons">
       <div v-for="lesson in sortedLessons" :key="lesson.id" class="lesson">
-        <img :src="lesson.image" :alt="lesson.alt">
+        <img :src="baseUrl + '/' + lesson.image" :alt="lesson.alt">
         <h2>{{ lesson.subject }}</h2>
         <p>Location: {{ lesson.location }}</p>
         <p>Price: £{{ lesson.price }}</p>
@@ -76,6 +76,7 @@
         return {
           cart: [],
           displayCart: false,
+          baseUrl: 'http://localhost:3000',
           sortType: 'price',
           ascending: true,
           orderMessage: '',
@@ -88,7 +89,7 @@
       },
       methods: {
         async fetchData() {
-          const url = 'http://localhost:3000/lessons'
+          const url = this.baseUrl + '/lessons'
           const response = await fetch(url)
           this.lessons = await response.json()
         },
