@@ -112,6 +112,16 @@
             lesson.availability++
           }
         },
+        async updateLessonSpaces() {
+          const purchased = this.lessons.filter(lesson => this.countInCart(lesson.id) > 0)
+          for (const lesson of purchased) {
+            await fetch(this.baseUrl + '/lessons/' + lesson._id, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ availability: lesson.availability })
+            })
+          }
+        },
         async checkout() {
           if (!this.canCheckout) return
           const newOrder = {
@@ -129,6 +139,7 @@
             this.orderMessage = 'Sorry, your order could not be submitted.'
             return
           }
+          await this.updateLessonSpaces()
           this.orderMessage = 'Thank you ' + this.order.name + ', your order has been confirmed.'
           this.cart = []
           this.order = { name: '', phone: '' }
