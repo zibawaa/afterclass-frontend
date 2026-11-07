@@ -112,14 +112,21 @@
             lesson.availability++
           }
         },
+        // PUT: updates the available spaces of one lesson in the database
+        async updateLesson(lesson) {
+          const updateBody = { availability: lesson.availability }
+          const url = this.baseUrl + '/lessons/' + lesson._id
+          const options = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updateBody)
+          }
+          await fetch(url, options)
+        },
         async updateLessonSpaces() {
           const purchased = this.lessons.filter(lesson => this.countInCart(lesson.id) > 0)
           for (const lesson of purchased) {
-            await fetch(this.baseUrl + '/lessons/' + lesson._id, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ availability: lesson.availability })
-            })
+            await this.updateLesson(lesson)
           }
         },
         async checkout() {
